@@ -21,7 +21,7 @@ NOMAD-1.0(25) 060/N0608.bin 0000001-1076940  pm=-7500 mag=-10000 Ep=+19010 xtra=
 | Component          | Description
 |:------------------:|:------------
 |`NOMAD‑1.0`         |The format identifier. Always `NOMAD‑1.0`.
-|`(25)`              |The length, in bytes, of the fixed portion of each star record in the file. Usually `25`, but sometimes `26` near the poles. `25`-type files contain 80 chunks, while `26`-type files contain only one chunk.
+|`(25)`              |The length, in bytes, of the fixed portion of each star record in the file. Usually `25`, but sometimes `26` near the poles. `25`-type files contain at most 79 chunks, while `26`-type files contain only one chunk.
 |`060/N0608.bin`     |The file identifier.
 |`0000001-1076940`   |The first and last star record numbers in the file. The first star record number of each file is always `0000001`. The last record number also indicates the number of star records in the file.
 |`pm=-7500`          |The proper motion offset, which must be added to the value of each proper motion field in each star record in the file.
