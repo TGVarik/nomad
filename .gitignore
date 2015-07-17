@@ -1,0 +1,5 @@
+bindat/
+c/
+node_modules/
+venv/
+temp/
