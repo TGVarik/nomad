@@ -51,3 +51,7 @@ If the file contains fewer chunks than would fill the chunk index, the remaining
 The chunk index contains n+1 non-zero chunk index records, where n is the number of chunks in the file. The final non-zero chunk index record has an offset value equal to the length of the file (thus pointing to the byte after the last byte of the file) and a star record number one more than the last star record number identified in the file header. This final, one-beyond entry in the index is required, so each file may have up to 79 chunks.
 Note that files with a 26-byte fixed record length have only one chunk each. Thus the chunk index will contain only two non-zero chunk index records, with the remainder of the index nulled.
 
+### Chunk ###
+
+todo
+
