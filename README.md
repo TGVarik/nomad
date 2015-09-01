@@ -72,7 +72,7 @@ Each chunk begins with a variable-length header. `offset` is relative to the pos
 |`xtra4` |`0x28`          |UInt32[nxtra4]|                          |Array of long (4-byte) extra values
 |`xtra2` |`0x28` +4*nxtra4|UInt16[nxtra2]|                          |Array of short (2-byte) extra values
 
-Note that there may be (up to two?) null bytes of padding after the end of `xtra2`.
+Note that there may be (up to two?) null bytes of padding after the end of `xtra2` to maintain word boundary alignment.
 
 #### Accelerator ####
 
