@@ -42,8 +42,8 @@ The header is followed immediately by the chunk index. The chunk index is always
 
 ##### Chunk Index Record #####
 
-|Offset|Type  |Example|Description
-|:----:|:----:|:-----:|:----------
+|Offset|Type  |Example      |Description
+|:----:|:----:|:-----------:|:----------
 |`0x00`|UInt32|`00 00 03 38`|Offset, from the beginning of the file, to the beginning of the binary portion of the described chunk.
 |`0x04`|UInt32|`00 00 00 01`|The record number of the first star record in the identified chunk.
 
@@ -53,5 +53,47 @@ Note that files with a 26-byte fixed record length have only one chunk each. Thu
 
 ### Chunk ###
 
-todo
+#### Chunk Header ####
 
+Each chunk begins with a variable-length header. `offset` is relative to the position given for the chunk by the offset field in the chunk's chunk index record:
+
+|Field   |Offset          |Type          |Example                   |Description
+|:-------|:--------------:|:------------:|:------------------------:|:-------------------------------------------
+|`head`  |`-0x18`         |Char[26]      |`Chunk#00 0000001‑0000002`|The chunk's ASCII header, always 26 bytes, identifying the chunk number (in the file), the first record in the chunk, and the last record in the chunk. **Note this field begins 24 bytes _before_ the position indicated in the chunk index!**
+|`hlen`  |`0x00`          |UInt32        |`00 00 00 30`             |Length in bytes of the chunk header; doubles as relative offset to beginning of accelerator
+|`min_id`|`0x04`          |UInt32        |`00 00 00 01`             |Minimum star record ID in the chunk (1)
+|`min_ra`|`0x08`          |UInt32        |`00 00 00 00`             |Minimum right ascension in the chunk in mas (0 mas = 0h00m00.000s RA)
+|`min_sd`|`0x10`          |UInt32        |`0D 0B D8 00`             |Minimum SPD (south polar distance) in the chunk in mas (218880000 mas = 60º48′00.000″ SPD = -29º12′00.000″ dec)
+|`max_id`|`0x14`          |UInt32        |`00 00 0D D8`             |Maximum star record ID in the chunk (3544)
+|`max_ra`|`0x18`          |UInt32        |`00 FF FF FF`             |Maximum right ascension in the chunk in mas (16777215mas = 4º39′37.215″ = 0h18m38.481s RA)
+|`max_sd`|`0x20`          |UInt32        |`0D 11 56 40`             |Maximum SPD in the chunk in mas (219240000 mas = 60º54′00.000″ SPD = -29º06′00.000″ dec)
+|`nxtra2`|`0x24`          |UInt16        |`00 07`                   |Number of short (2-byte) extra values in the header (7)
+|`nxtra4`|`0x26`          |UInt16        |`00 00`                   |Number of long (4-byte) extra values in the header (0)
+|`xtra4` |`0x28`          |UInt32[nxtra4]|                          |Array of long (4-byte) extra values
+|`xtra2` |`0x28` +4*nxtra4|UInt16[nxtra2]|                          |Array of short (2-byte) extra values
+
+Note that there may be (up to two?) null bytes of padding after the end of `xtra2`.
+
+#### Accelerator ####
+
+The header is followed by the accelerator, a lookup structure used by the original NOMAD software for rapidly locating stars by RA within a chunk. The accelerator begins `hlen` bytes after the beginning (discounting the `head` string) of the chunk header. The accelerator is a variable-length table of 12-byte entries of the following format:
+
+|Field   |Type  |Description
+|:------:|:----:|:----------
+|`offset`|UInt32|Offset from beginning of accelerator to beginning of identified star record
+|`id`    |UInt32|ID number of the identified star record
+|`ra`    |UInt32|RA in mas of the identified star record
+
+To determine the number of accelerator records, divide `offset` of the first accelerator entry by 12. For example, the first entry in `bindat/060/N0608.bin`'s accelerator for chunk #00 is:
+
+|Field   |Value
+|:------:|:----:
+|`offset`|`00 00 00 90`
+|`id`    |`00 00 00 01`
+|`ra`    |`00 00 0D 2A`
+
+This entry gives the offset from the beginning of the accelerator to the beginning of the first star record as `0x90`, or 144 bytes. Because each accelerator record is 12 bytes long, expect a total of 144/12 = 12 accelerator entries. There should be one accelerator entry for every 500 star records in the chunk, but this is not guaranteed.
+
+#### Star Records ####
+
+TODO
